@@ -14,10 +14,14 @@
     "eslint-plugin-import": "^2.20.1"
   },
   "dependencies": {
+    "axios": "^0.19.2",
+    "axios-debug-log": "^0.6.2",
     "cheerio": "^1.0.0-rc.3",
     "color": "^3.1.2",
     "colors": "^1.4.0",
     "commander": "^4.1.1",
-    "puppeteer": "^2.1.1"
+    "puppeteer": "^2.1.1",
+    "qs": "^6.9.1",
+    "request": "^2.88.2"
   }
 }

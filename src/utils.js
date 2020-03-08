@@ -1,23 +1,21 @@
+const airports = require('./airports').default;
 
-function urlGenerator(programOptions) {
-  const urlPattern = 'https://www.decolar.com/shop/flights/search/roundtrip/<to>/<from>/<departure>/<return>/1/0/0/NA/NA/NA/NA/NA/';
-  const url = urlPattern.replace('<to>', programOptions.to)
+function urlGenerator(url, programOptions) {
+  // const urlPattern = 'https://www.decolar.com/shop/flights/search/roundtrip/<to>/<from>/<departure>/<return>/1/0/0/NA/NA/NA/NA/NA/';
+  const formattedUrl = url.replace('<to>', programOptions.to)
     .replace('<from>', programOptions.from)
     .replace('<departure>', programOptions.departure)
     .replace('<return>', programOptions.return);
 
-  return url;
+  return formattedUrl;
 }
 
-
 function isValidDate(dateStr) {
-  const dateFormatRegex = /(\d{4})-(\d{2})-(\d{2})$/;
+  const dateRegex = /(\d{4})-(\d{2})-(\d{2})$/;
 
-  if (!dateFormatRegex.test(dateStr)) {
-    throw new Error(`Date ${dateStr} is invalid. The value should be in following format yyyy-mm-dd.`);
-  }
+  if (!dateRegex.test(dateStr)) throw new Error(`Date ${dateStr} is invalid. The value must be in following format: yyyy-mm-dd.`);
 
-  const date = dateFormatRegex.exec(dateStr);
+  const date = dateRegex.exec(dateStr);
   const year = parseInt(date[1], 10);
   const month = parseInt(date[2], 10);
   const day = parseInt(date[3], 10);
@@ -30,20 +28,47 @@ function isValidDate(dateStr) {
   throw new Error(`Date ${dateStr} is invalid. Inform a valid date.`);
 }
 
+function isValidCities(programOptions) {
+  const airportsNames = airports.map((airport) => airport.code);
+  if (airportsNames.includes(programOptions.to.toUpperCase()) && airportsNames.includes(programOptions.from.toUpperCase())) {
+    return true;
+  }
+
+  throw new Error('Informed city of departure or return is invalid.');
+}
+
 function validateArguments(programOptions) {
-  if (isValidDate(programOptions.departure) && isValidDate(programOptions.return)) {
+  if (isValidDate(programOptions.departure) && isValidDate(programOptions.return) && isValidCities(programOptions)) {
     const departureDate = new Date(programOptions.departure);
     const returnDate = new Date(programOptions.return);
 
-    if (departureDate > returnDate) {
-      throw new Error('Date of return should be after the departure date.');
-    }
+    if (departureDate <= new Date()) throw new Error('Departure date must be greater than today.');
 
-    if (Number.isNaN(programOptions.maximum)) {
-      throw new Error('Maximum price should be an number value');
-    }
+    if (departureDate > returnDate) throw new Error('Date of return must be after the departure date.');
+
+    if (Number.isNaN(programOptions.maximum)) throw new Error('Maximum price must be an number value.');
   }
   return true;
 }
 
-exports.default = { validateArguments, urlGenerator };
+const parseDate = (programOptions) => {
+  const departureDate = new Date(programOptions.departure);
+  const returnDate = new Date(programOptions.return);
+
+  return {
+    getDepartureDay: function getDepartureDay() {
+      return departureDate.getDate() + 1;
+    },
+    getReturnDay: function getReturnDay() {
+      return returnDate.getDate() + 1;
+    },
+    getDepartureMonthWithYear: function getDepartureMonthWithYear() {
+      return `${departureDate.getFullYear()}-${departureDate.getMonth() + 1}`;
+    },
+    getReturnMonthWithYear: function getReturnMonthWithYear() {
+      return `${returnDate.getFullYear()}-${returnDate.getMonth() + 1}`;
+    },
+  };
+};
+
+exports.default = { validateArguments, urlGenerator, parseDate };
