@@ -53,11 +53,12 @@ const getLowestPrice = async (programOptions) => {
 
     const returnItems = $('#tbl-return-flights > .flight-item > .flight-price-container.-azul > .area-radio.no-touch > .flight-price > .fare-price').toArray();
     const returnPrices = returnItems.map((item) => parseFloat(item.firstChild.data.replace('.', '').replace(',', '.'), 10));
-    const lowestPrice = Number((Math.min(...departurePrices) + Math.min(...returnPrices)).toFixed(2));
+    const lowestPrice = Number((Math.min(...departurePrices) + Math.min(...returnPrices))
+      .toFixed(2));
 
     logger.info('[Azul] - Lowest price: %d', lowestPrice);
 
-    return lowestPrice;
+    return { company: 'Azul', lowestPrice };
   });
 };
 

@@ -13,7 +13,7 @@ const getLowestPrice = async (programOptions) => {
 
     logger.info('[LATAM] - Lowest price: %d', lowestPrice);
 
-    return lowestPrice;
+    return { company: 'LATAM', lowestPrice };
   });
 };
 

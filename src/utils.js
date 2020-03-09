@@ -1,7 +1,6 @@
 const airports = require('./airports').default;
 
 function urlGenerator(url, programOptions) {
-  // const urlPattern = 'https://www.decolar.com/shop/flights/search/roundtrip/<to>/<from>/<departure>/<return>/1/0/0/NA/NA/NA/NA/NA/';
   const formattedUrl = url.replace('<to>', programOptions.to)
     .replace('<from>', programOptions.from)
     .replace('<departure>', programOptions.departure)
@@ -30,7 +29,8 @@ function isValidDate(dateStr) {
 
 function isValidCities(programOptions) {
   const airportsNames = airports.map((airport) => airport.code);
-  if (airportsNames.includes(programOptions.to.toUpperCase()) && airportsNames.includes(programOptions.from.toUpperCase())) {
+  if (airportsNames.includes(programOptions.to.toUpperCase())
+  && airportsNames.includes(programOptions.from.toUpperCase())) {
     return true;
   }
 
@@ -38,7 +38,9 @@ function isValidCities(programOptions) {
 }
 
 function validateArguments(programOptions) {
-  if (isValidDate(programOptions.departure) && isValidDate(programOptions.return) && isValidCities(programOptions)) {
+  if (isValidDate(programOptions.departure)
+    && isValidDate(programOptions.return)
+    && isValidCities(programOptions)) {
     const departureDate = new Date(programOptions.departure);
     const returnDate = new Date(programOptions.return);
 

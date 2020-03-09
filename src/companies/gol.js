@@ -55,7 +55,7 @@ const getLowestPrice = async (programOptions) => {
 
     logger.info('[GOL] - Lowest price: %d', lowestPrice);
 
-    return lowestPrice;
+    return { company: 'GOL', lowestPrice };
   });
 };
 
