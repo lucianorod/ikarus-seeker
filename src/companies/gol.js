@@ -2,8 +2,11 @@ const cheerio = require('cheerio');
 const qs = require('qs');
 const { instance } = require('../config/axios').default;
 const { parseDate } = require('../utils').default;
+const logger = require('../config/logger').default;
 
 const getLowestPrice = async (programOptions) => {
+  logger.info('[GOL] - Seeking tickets');
+
   const parsedDate = parseDate(programOptions);
 
   const baseURL = 'https://compre2.voegol.com.br';
@@ -39,7 +42,7 @@ const getLowestPrice = async (programOptions) => {
     validateStatus: (status) => status >= 200 && status < 303,
   }).then((response) => response);
 
-  instance.post('/Select2.aspx', formString, {
+  return instance.post('/Select2.aspx', formString, {
     baseURL,
     headers: {
       ...headers,
@@ -47,9 +50,13 @@ const getLowestPrice = async (programOptions) => {
     },
   }).then((response) => {
     const $ = cheerio.load(response.data);
-    const price = $('#fareComboBanner > div.fare-combo > div.banner-details > div.fare-details > div:nth-child(4) > div.value').text();
-    console.log(price);
+    const lowestPriceStr = $('#fareComboBanner > div.fare-combo > div.banner-details > div.fare-details > div:nth-child(4) > div.value').text();
+    const lowestPrice = Number(lowestPriceStr.replace('R$', '').replace('.', '').replace(',', '.'));
+
+    logger.info('[GOL] - Lowest price: %d', lowestPrice);
+
+    return lowestPrice;
   });
 };
 
-exports.default = getLowestPrice;
+exports.default = { getLowestPrice };

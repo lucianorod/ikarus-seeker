@@ -1,8 +1,14 @@
 const cheerio = require('cheerio');
 const qs = require('qs');
 const { instance } = require('../config/axios').default;
+const { parseDate } = require('../utils').default;
+const logger = require('../config/logger').default;
 
-(async () => {
+const getLowestPrice = async (programOptions) => {
+  logger.info('[Azul] - Seeking tickets');
+
+  const parsedDate = parseDate(programOptions);
+
   const baseURL = 'https://viajemais.voeazul.com.br';
 
   const headers = {
@@ -15,12 +21,12 @@ const { instance } = require('../config/axios').default;
   const form = {
     __EVENTTARGET: 'ControlGroupSearch$LinkButtonSubmit',
     [`${prefix}RadioButtonMarketStructure`]: 'RoundTrip',
-    [`${prefix}TextBoxMarketOrigin1`]: 'SAO',
-    [`${prefix}TextBoxMarketDestination1`]: 'BEL',
-    [`${prefix}DropDownListMarketDay1`]: '15',
-    [`${prefix}DropDownListMarketMonth1`]: '2020-04',
-    [`${prefix}DropDownListMarketDay2`]: '21',
-    [`${prefix}DropDownListMarketMonth2`]: '2020-05',
+    [`${prefix}TextBoxMarketOrigin1`]: programOptions.to,
+    [`${prefix}TextBoxMarketDestination1`]: programOptions.from,
+    [`${prefix}DropDownListMarketDay1`]: parsedDate.getDepartureDay(),
+    [`${prefix}DropDownListMarketMonth1`]: parsedDate.getDepartureMonthWithYear(),
+    [`${prefix}DropDownListMarketDay2`]: parsedDate.getReturnDay(),
+    [`${prefix}DropDownListMarketMonth2`]: parsedDate.getReturnMonthWithYear(),
     [`${prefix}DropDownListPassengerType_ADT`]: '1',
     [`${prefix}DropDownListFareTypes`]: 'R',
   };
@@ -34,7 +40,7 @@ const { instance } = require('../config/axios').default;
     validateStatus: (status) => status >= 200 && status < 303,
   }).then((response) => response);
 
-  instance.post('Availability.aspx', formString, {
+  return instance.post('/Availability.aspx', formString, {
     baseURL,
     headers: {
       ...headers,
@@ -47,8 +53,12 @@ const { instance } = require('../config/axios').default;
 
     const returnItems = $('#tbl-return-flights > .flight-item > .flight-price-container.-azul > .area-radio.no-touch > .flight-price > .fare-price').toArray();
     const returnPrices = returnItems.map((item) => parseFloat(item.firstChild.data.replace('.', '').replace(',', '.'), 10));
+    const lowestPrice = Number((Math.min(...departurePrices) + Math.min(...returnPrices)).toFixed(2));
 
-    console.log(departurePrices, returnPrices);
-    console.log(Math.min(...departurePrices), Math.min(...returnPrices));
+    logger.info('[Azul] - Lowest price: %d', lowestPrice);
+
+    return lowestPrice;
   });
-})();
+};
+
+exports.default = { getLowestPrice };

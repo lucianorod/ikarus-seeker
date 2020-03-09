@@ -1,8 +1,12 @@
 const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
-const golLowestPrice = require('./companies/gol').default;
-
+const gol = require('./companies/gol').default;
+const latam = require('./companies/latam').default;
+const azul = require('./companies/azul').default;
 const { validateArguments } = require('./utils').default;
+const logger = require('./config/logger').default;
+
+const companies = [gol, latam, azul];
 
 async function getFirstFlights(url) {
   const browser = await puppeteer.launch();
@@ -20,9 +24,11 @@ async function getFirstFlights(url) {
   return prices;
 }
 
-function runSeeker(programOptions) {
+async function runSeeker(programOptions) {
   if (validateArguments(programOptions)) {
-    golLowestPrice(programOptions);
+    const prices = await Promise.all(companies.map((company) => company.getLowestPrice(programOptions)));
+
+    logger.info('The lowest price of all companies is %d', Math.min(...prices));
   }
 }
 

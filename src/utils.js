@@ -42,7 +42,7 @@ function validateArguments(programOptions) {
     const departureDate = new Date(programOptions.departure);
     const returnDate = new Date(programOptions.return);
 
-    if (departureDate <= new Date()) throw new Error('Departure date must be greater than today.');
+    if (departureDate <= Date(Date().toLocaleString())) throw new Error('Departure date must be greater than today.');
 
     if (departureDate > returnDate) throw new Error('Date of return must be after the departure date.');
 

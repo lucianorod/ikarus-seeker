@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "author": "Luciano Sacramento",
   "license": "ISC",
@@ -22,6 +23,7 @@
     "commander": "^4.1.1",
     "puppeteer": "^2.1.1",
     "qs": "^6.9.1",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "winston": "^3.2.1"
   }
 }
