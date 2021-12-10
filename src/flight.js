@@ -5,7 +5,8 @@ const decolar = require('./companies/decolar').default;
 const { validateArguments } = require('./utils').default;
 const logger = require('./config/logger').default;
 
-const companies = [gol, latam, azul, decolar];
+// const companies = [gol, latam, azul, decolar];
+const companies = [gol];
 
 async function runSeeker(programOptions) {
   if (validateArguments(programOptions)) {
