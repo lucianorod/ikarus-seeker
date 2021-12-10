@@ -21,7 +21,7 @@ function isValidDate(dateStr) {
   const validYears = [...Array(3).keys()].map((n) => year + n);
   const lastDayInMonth = new Date(year, month, 0).getDate();
 
-  if (validYears.includes(year) && (month < 12) && (day < lastDayInMonth)) {
+  if (validYears.includes(year) && (month <= 12) && (day < lastDayInMonth)) {
     return true;
   }
   throw new Error(`Date ${dateStr} is invalid. Inform a valid date.`);
