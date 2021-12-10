@@ -45,6 +45,42 @@ const getLowestPrice = async (programOptions) => {
     'Authorization': `Bearer ${token}`
   }
 
+  const firstItinerary = { 
+    "from": {
+      "code": programOptions.from,
+      "useNearbyLocations": false
+    },
+    "to": {
+      "code": programOptions.to,
+      "useNearbyLocations": false
+    },
+    "when": {
+      "date": `${programOptions.departure}T00:00:00`
+    },
+    "selectedOfferRef": null,
+    "plusMinusDays": null
+  }
+
+  const secondItinerary = { 
+    "from": {
+      "code": programOptions.to,
+      "useNearbyLocations": false
+    },
+    "to": {
+      "code": programOptions.from,
+      "useNearbyLocations": false
+    },
+    "when": {
+      "date": `${programOptions.return}T00:00:00`
+    },
+    "selectedOfferRef": null,
+    "plusMinusDays": null
+  }
+
+  const itineraryParts = [firstItinerary, secondItinerary]
+
+  console.log(firstItinerary);
+
   const searchBody = {
     "promocodebanner": false,
     "destinationCountryToUSA": false,
@@ -55,64 +91,8 @@ const getLowestPrice = async (programOptions) => {
       "awardBooking": false,
       "searchType": "BRANDED",
       "promoCodes": [],
-      "originalItineraryParts": [{
-        "from": {
-          "code": "SAO",
-          "useNearbyLocations": false
-        },
-        "to": {
-          "code": "BEL",
-          "useNearbyLocations": false
-        },
-        "when": {
-          "date": `${parsedDate}T00:00:00`
-        },
-        "selectedOfferRef": null,
-        "plusMinusDays": null
-      }, {
-        "from": {
-          "code": "BEL",
-          "useNearbyLocations": false
-        },
-        "to": {
-          "code": "SAO",
-          "useNearbyLocations": false
-        },
-        "when": {
-          "date": "2022-01-13T00:00:00"
-        },
-        "selectedOfferRef": null,
-        "plusMinusDays": null
-      }],
-      "itineraryParts": [{
-        "from": {
-          "code": "SAO",
-          "useNearbyLocations": false
-        },
-        "to": {
-          "code": "BEL",
-          "useNearbyLocations": false
-        },
-        "when": {
-          "date": "2021-12-23T00:00:00"
-        },
-        "selectedOfferRef": null,
-        "plusMinusDays": null
-      }, {
-        "from": {
-          "code": "BEL",
-          "useNearbyLocations": false
-        },
-        "to": {
-          "code": "SAO",
-          "useNearbyLocations": false
-        },
-        "when": {
-          "date": "2022-01-13T00:00:00"
-        },
-        "selectedOfferRef": null,
-        "plusMinusDays": null
-      }],
+      "originalItineraryParts": itineraryParts,
+      "itineraryParts": itineraryParts,
       "passengers": {
         "ADT": 1,
         "CHD": 0,
@@ -122,6 +102,8 @@ const getLowestPrice = async (programOptions) => {
       "preferredOperatingCarrier": null
     }
   }
+
+  console.log(searchBody);
 
   const searchResponse = await instance.post(searchURL, searchBody, {
     searchURL,
